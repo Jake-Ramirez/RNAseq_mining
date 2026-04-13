@@ -85,3 +85,22 @@ This project is expected to result in:
     during vector colonization.
 -   A proof-of-concept demonstration of indirect pathogen
     transcriptomics through public data mining.
+
+------------------------------------------------------------------------
+
+## Project update 04/13/2026
+
+### Status Summary
+The current phase of the project has focused heavily on developing a robust, HPC-ready Preprocessing Pipeline (preprocess_homalodisca.sh). While the initial scope intended to reach deeper into the downstream analysis (xylella_miner.py), the technical challenges and the necessity for a high-quality data foundation shifted our primary efforts toward the preprocessing stage.
+
+ ### Key Milestones Achieved:
+- Infrastructure & Scalability: Transitioned the host-filtering engine from BWA to STAR, optimized specifically for the Alabama HPC environment (Slurm).
+
+- Modularity & Reproducibility: Implemented automated genome indexing, dependency validation, and flexible argument parsing. This ensures that the pipeline can be reused for any host-pathogen study beyond this specific project.
+
+- Data Integrity: Developed rigorous checks for paired-end synchronization and host-read removal, ensuring that the input for the next stage is clean and reliable.
+
+### Technical Debt & Next Steps
+- Xylella Miner Development: Due to the extensive time allocated to ensuring the reproducibility and efficiency of the preprocessing script, the xylella_miner.py tool is currently in its early conceptual/boilerplate stage.
+
+- Justification: We prioritized a solid preprocessing foundation. In bioinformatics, downstream results are only as good as the input data ("garbage in, garbage out"). By delivering a modular and robust preprocessing script, we have established a reproducible framework that guarantees the project's long-term viability and ease of scaling.
