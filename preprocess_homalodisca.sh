@@ -13,7 +13,7 @@ THREADS=4
 
 # Function to show usage
 usage() {
-    echo "Usage: $0 -r1 <R1.fastq> -r2 <R2.fastq> -g <host_genome.fasta> -o <output_dir> -s <sample_name>"
+    echo "Usage: $0 -a <R1.fastq> -b <R2.fastq> -g <host_genome.fasta> -o <output_dir> -s <sample_name>"
     echo ""
     echo "Options:"
     echo "  -a    Forward reads (R1) FASTQ file"
@@ -45,8 +45,8 @@ check_command() {
 # Parse command line arguments
 while getopts "a:b:g:o:s:t:h" opt; do
     case $opt in
-        r1) R1_FILE="$OPTARG" ;;
-        r2) R2_FILE="$OPTARG" ;;
+        a) R1_FILE="$OPTARG" ;;
+        b) R2_FILE="$OPTARG" ;;
         g) HOST_GENOME="$OPTARG" ;;
         o) OUTPUT_DIR="$OPTARG" ;;
         s) SAMPLE_NAME="$OPTARG" ;;
@@ -188,7 +188,7 @@ log "Generating quality statistics..."
 FINAL_READ_COUNT=$(wc -l < "$FINAL_R1" | awk '{print $1/4}')
 
 # Simple quality metrics
-AVG_LENGTH=$(awk 'NR%4==2{sum+=length($0); count++} END{print int(sum/count)}' "$FINAL_R1")
+AVG_LENGTH=$(awk 'NR%4==2{sum+=length($0); count++} END{if (count>0) print int(sum/count); else print 0}' "$FINAL_R1")
 
 log "Final read count: $FINAL_READ_COUNT"
 log "Average read length: $AVG_LENGTH bp"
