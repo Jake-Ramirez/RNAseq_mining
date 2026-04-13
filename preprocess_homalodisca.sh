@@ -80,9 +80,10 @@ check_command "samtools"
 
 # Check if host genome filtering is requested
 FILTER_HOST=false
+GENOME_DIR="${HOST_GENOME}_star_index"
 if [[ -n "$HOST_GENOME" ]]; then
-    if [[ ! -f "$HOST_GENOME" ]]; then
-        log "ERROR: Host genome file not found: $HOST_GENOME"
+    if [[ ! -f "$HOST_GENOME" && ! -d "$HOST_GENOME" ]]; then
+        log "ERROR: Host genome path not found (checked file and directory): $HOST_GENOME"
         exit 1
     fi
     FILTER_HOST=true
