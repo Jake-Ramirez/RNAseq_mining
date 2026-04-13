@@ -75,7 +75,7 @@ fi
 '''
 # Check dependencies
 log "Checking dependencies..."
-check_command "bwa"
+check_command "STAR"
 check_command "samtools"
 
 # Check if host genome filtering is requested
