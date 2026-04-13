@@ -16,8 +16,8 @@ usage() {
     echo "Usage: $0 -r1 <R1.fastq> -r2 <R2.fastq> -g <host_genome.fasta> -o <output_dir> -s <sample_name>"
     echo ""
     echo "Options:"
-    echo "  -r1    Forward reads (R1) FASTQ file"
-    echo "  -r2    Reverse reads (R2) FASTQ file" 
+    echo "  -a    Forward reads (R1) FASTQ file"
+    echo "  -b    Reverse reads (R2) FASTQ file" 
     echo "  -g     Host genome FASTA file (Homalodisca)"
     echo "  -o     Output directory (default: processed)"
     echo "  -s     Sample name"
@@ -25,7 +25,7 @@ usage() {
     echo "  -h     Show this help"
     echo ""
     echo "Example:"
-    echo "  $0 -r1 sample1_R1.fastq.gz -r2 sample1_R2.fastq.gz -g homalodisca_genome.fasta -s sample1"
+    echo "  $0 -a sample1_R1.fastq.gz -b sample1_R2.fastq.gz -g homalodisca_genome.fasta -s sample1"
     exit 1
 }
 
@@ -43,7 +43,7 @@ check_command() {
 }
 
 # Parse command line arguments
-while getopts "r1:r2:g:o:s:t:h" opt; do
+while getopts "a:b:g:o:s:t:h" opt; do
     case $opt in
         r1) R1_FILE="$OPTARG" ;;
         r2) R2_FILE="$OPTARG" ;;
