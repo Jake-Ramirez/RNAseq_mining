@@ -80,13 +80,14 @@ check_command "samtools"
 
 # Check if host genome filtering is requested
 FILTER_HOST=false
-GENOME_DIR="${HOST_GENOME}_star_index"
 if [[ -n "$HOST_GENOME" ]]; then
     if [[ ! -f "$HOST_GENOME" && ! -d "$HOST_GENOME" ]]; then
         log "ERROR: Host genome path not found (checked file and directory): $HOST_GENOME"
         exit 1
     fi
     FILTER_HOST=true
+    # Index folder based on the name of the genome
+    GENOME_DIR="${HOST_GENOME}_star_index"
 fi
 
 # Create output directory
@@ -108,28 +109,43 @@ log "Input reads: $TOTAL_READS"
 
 # Host genome filtering (if genome provided)
 if [[ "$FILTER_HOST" == true ]]; then
-    log "Filtering host reads using BWA..."
+    log "Filtering host reads using STAR..."
     
-    # Check if BWA index exists, create if not
-    if [[ ! -f "$HOST_GENOME.bwt" ]]; then
-        log "Building BWA index for host genome..."
-        bwa index "$HOST_GENOME"
+    # Check if STAR index directory exists, create if not
+    if [[ ! -d "$GENOME_DIR/SAindex" ]]; then
+        log "Building STAR index for host genome in $GENOME_DIR..."
+        mkdir -p "$GENOME_DIR"
+        STAR --runThreadN "$THREADS" \
+             --runMode genomeGenerate \
+             --genomeDir "$GENOME_DIR" \
+             --genomeFastaFiles "$HOST_GENOME" \
+             --sjdbOverhang 99
+    else
+        log "STAR index found in $GENOME_DIR, skipping index build."
     fi
     
-    # Align reads to host genome
-    log "Aligning reads to host genome..."
-    SAM_FILE="$OUTPUT_DIR/${SAMPLE_NAME}_host_aligned.sam"
+    # Align reads to host genome using STAR
+    log "Aligning reads to host genome with STAR..."
     
-    bwa mem -t "$THREADS" "$HOST_GENOME" "$R1_FILE" "$R2_FILE" > "$SAM_FILE"
-    
-    # Extract unaligned reads (non-host)
+    STAR --runThreadN "$THREADS" \
+         --genomeDir "$GENOME_DIR" \
+         --readFilesIn "$R1_FILE" "$R2_FILE" \
+         --readFilesCommand zcat \
+         --outFileNamePrefix "$OUTPUT_DIR/${SAMPLE_NAME}_" \
+         --outSAMtype SAM \
+         --outReadsUnmapped Fastx
+
+    # STAR genera las lecturas no mapeadas con nombres fijos, las renombramos para el script
     log "Extracting non-host reads..."
     NONHOST_R1="$OUTPUT_DIR/${SAMPLE_NAME}_nonhost_R1.fastq"
     NONHOST_R2="$OUTPUT_DIR/${SAMPLE_NAME}_nonhost_R2.fastq"
+
+    # STAR las llama Unmapped.out.mate1 y Unmapped.out.mate2
+    mv "$OUTPUT_DIR/${SAMPLE_NAME}_Unmapped.out.mate1" "$NONHOST_R1"
+    mv "$OUTPUT_DIR/${SAMPLE_NAME}_Unmapped.out.mate2" "$NONHOST_R2"
     
-    # Get unaligned reads (flag 4 = unaligned)
-    samtools view -b -f 4 "$SAM_FILE" | \
-    samtools fastq -1 "$NONHOST_R1" -2 "$NONHOST_R2" -0 /dev/null -s /dev/null -n -
+    # Definimos el SAM_FILE para el conteo y limpieza posterior (nombre que pone STAR por defecto)
+    SAM_FILE="$OUTPUT_DIR/${SAMPLE_NAME}_Aligned.out.sam"
     
     # Count non-host reads
     NONHOST_READS=$(wc -l < "$NONHOST_R1" | awk '{print $1/4}')
@@ -139,7 +155,10 @@ if [[ "$FILTER_HOST" == true ]]; then
     log "Host reads filtered: ${HOST_PERCENTAGE}%"
     
     # Clean up SAM file
-    rm "$SAM_FILE"
+    if [[ -f "$SAM_FILE" ]]; then
+        log "Cleaning up large SAM file..."
+        rm "$SAM_FILE"
+    fi
     
     # Set output files for downstream analysis
     FINAL_R1="$NONHOST_R1"
