@@ -131,8 +131,9 @@ if [[ "$FILTER_HOST" == true ]]; then
          --genomeDir "$GENOME_DIR" \
          --readFilesIn "$R1_FILE" "$R2_FILE" \
          --readFilesCommand zcat \
-         --outFileNamePrefix "$OUTPUT_DIR/${SAMPLE_NAME}_" \
+         --outFileNamePrefix "$OUTPUT_DIR/${SAMPLE_NAME}" \
          --outSAMtype SAM \
+	 --outFilterMismatchNmax 10 \
          --outReadsUnmapped Fastx
 
     # STAR genera las lecturas no mapeadas con nombres fijos, las renombramos para el script
