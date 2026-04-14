@@ -131,19 +131,26 @@ if [[ "$FILTER_HOST" == true ]]; then
          --genomeDir "$GENOME_DIR" \
          --readFilesIn "$R1_FILE" "$R2_FILE" \
          --readFilesCommand zcat \
-         --outFileNamePrefix "$OUTPUT_DIR/${SAMPLE_NAME}" \
+         --outFileNamePrefix "$OUTPUT_DIR/${SAMPLE_NAME}_" \
          --outSAMtype SAM \
 	 --outFilterMismatchNmax 10 \
-         --outReadsUnmapped Fastx
+         --outReadsUnmapped Fastx \
+	 --outTmpDir "$OUTPUT_DIR/${SAMPLE_NAME}_STARtmp"
 
-    # STAR genera las lecturas no mapeadas con nombres fijos, las renombramos para el script
-    log "Extracting non-host reads..."
-    NONHOST_R1="$OUTPUT_DIR/${SAMPLE_NAME}_nonhost_R1.fastq"
-    NONHOST_R2="$OUTPUT_DIR/${SAMPLE_NAME}_nonhost_R2.fastq"
+    # Define unmapped files created by default
+    UNMAPPED_R1="$OUTPUT_DIR/${SAMPLE_NAME}_Unmapped.out.mate1"
+    UNMAPPED_R2="$OUTPUT_DIR/${SAMPLE_NAME}_Unmapped.out.mate2"
 
-    # STAR las llama Unmapped.out.mate1 y Unmapped.out.mate2
-    mv "$OUTPUT_DIR/${SAMPLE_NAME}_Unmapped.out.mate1" "$NONHOST_R1"
-    mv "$OUTPUT_DIR/${SAMPLE_NAME}_Unmapped.out.mate2" "$NONHOST_R2"
+    # Robust file handling in case nothing maps
+    log "Organizing non-host reads..."
+    if [[ -f "$UNMAPPED_R1" && -f "$UNMAPPED_R2" ]]; then
+        mv "$UNMAPPED_R1" "$NONHOST_R1"
+        mv "$UNMAPPED_R2" "$NONHOST_R2"
+    else
+        log "WARNING: Unmapped files not found. Creating empty files for compatibility."
+        touch "$NONHOST_R1"
+        touch "$NONHOST_R2"
+    fi
     
     # Definimos el SAM_FILE para el conteo y limpieza posterior (nombre que pone STAR por defecto)
     SAM_FILE="$OUTPUT_DIR/${SAMPLE_NAME}_Aligned.out.sam"
@@ -160,6 +167,15 @@ if [[ "$FILTER_HOST" == true ]]; then
         log "Cleaning up large SAM file..."
         rm "$SAM_FILE"
     fi
+    
+    # Clean up large SAM and STAR logs
+    log "Cleaning up STAR intermediate files..."
+    rm -f "$OUTPUT_DIR/${SAMPLE_NAME}_Aligned.out.sam"
+    rm -f "$OUTPUT_DIR/${SAMPLE_NAME}_Log.out"
+    rm -f "$OUTPUT_DIR/${SAMPLE_NAME}_Log.progress.out"
+    rm -f "$OUTPUT_DIR/${SAMPLE_NAME}_Log.final.out"
+    rm -f "$OUTPUT_DIR/${SAMPLE_NAME}_SJ.out.tab"
+    rm -rf "$OUTPUT_DIR/${SAMPLE_NAME}_STARtmp"
     
     # Set output files for downstream analysis
     FINAL_R1="$NONHOST_R1"
