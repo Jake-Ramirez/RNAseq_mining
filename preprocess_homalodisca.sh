@@ -112,7 +112,7 @@ if [[ "$FILTER_HOST" == true ]]; then
     log "Filtering host reads using STAR..."
     
     # Check if STAR index directory exists, create if not
-    if [[ ! -d "$GENOME_DIR/SAindex" ]]; then
+    if [[ ! -d "$GENOME_DIR" ]] || [[ ! -f "$GENOME_DIR/SAindex" ]]; then
         log "Building STAR index for host genome in $GENOME_DIR..."
         mkdir -p "$GENOME_DIR"
         STAR --runThreadN "$THREADS" \
