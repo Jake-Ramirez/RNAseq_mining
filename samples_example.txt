@@ -1,0 +1,9 @@
+# Example sample list for Xylella detection
+# Format: sample_id<TAB>fastq_file
+# Lines starting with # are comments
+
+sample1	data/sample1_combined.fastq
+sample2	data/sample2_combined.fastq  
+sample3	data/sample3_combined.fastq
+control1	data/negative_control.fastq
+infected1	data/positive_control.fastq
