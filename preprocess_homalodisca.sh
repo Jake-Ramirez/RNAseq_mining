@@ -72,7 +72,7 @@ if [[ ! -f "$R2_FILE" ]]; then
     log "ERROR: R2 file not found: $R2_FILE"
     exit 1
 fi
-'''
+
 # Check dependencies
 log "Checking dependencies..."
 check_command "STAR"
