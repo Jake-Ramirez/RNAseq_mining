@@ -69,7 +69,7 @@ echo "✅ Created test FASTQ files (5 reads each)"
 
 # Test 1: Script syntax check
 echo "🔍 Test 1: Checking script syntax..."
-if bash -n ../preprocess_homalodisca_fixed.sh; then
+if bash -n ../preprocess_homalodisca.sh; then
     echo "✅ Syntax check passed"
 else
     echo "❌ Syntax error found!"
@@ -78,7 +78,7 @@ fi
 
 # Test 2: Help message
 echo "🔍 Test 2: Testing help message..."
-if ../preprocess_homalodisca_fixed.sh -h > /dev/null 2>&1; then
+if ../preprocess_homalodisca.sh -h > /dev/null 2>&1; then
     echo "✅ Help message works"
 else
     echo "❌ Help message failed"
@@ -86,7 +86,7 @@ fi
 
 # Test 3: Missing arguments
 echo "🔍 Test 3: Testing error handling..."
-if ! ../preprocess_homalodisca_fixed.sh 2>/dev/null; then
+if ! ../preprocess_homalodisca.sh 2>/dev/null; then
     echo "✅ Error handling works (correctly fails with missing args)"
 else
     echo "❌ Should fail with missing arguments"
@@ -94,7 +94,7 @@ fi
 
 # Test 4: Basic preprocessing (without host filtering)
 echo "🔍 Test 4: Testing basic preprocessing..."
-../preprocess_homalodisca_fixed.sh -a test_R1.fastq -b test_R2.fastq -s test_sample -o processed
+../preprocess_homalodisca.sh -a test_R1.fastq -b test_R2.fastq -s test_sample -o processed
 
 if [[ -f "processed/test_sample_combined.fastq" ]]; then
     READ_COUNT=$(wc -l < processed/test_sample_combined.fastq | awk '{print $1/4}')
