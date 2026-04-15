@@ -118,7 +118,7 @@ if [[ "$FILTER_HOST" == true ]]; then
         STAR --runThreadN "$THREADS" \
              --runMode genomeGenerate \
              --genomeDir "$GENOME_DIR" \
-             --genomeFastaFiles "$HOST_GENOME" \
+             --genomeFastaFiles "$HOST_GENOME"
     else
         log "STAR index found in $GENOME_DIR, skipping index build."
     fi
