@@ -1,0 +1,22 @@
+#!/bin/bash
+#PBS -N XylellaPreproc
+#PBS -l nodes=1:ppn=16
+#PBS -l mem=45gb
+#PBS -l walltime=05:00:00
+#PBS -j oe
+#PBS -o logs_preproc.log
+
+# Moverse a la carpeta donde lanzaste el trabajo
+cd $PBS_O_WORKDIR
+
+# Cargar el ambiente de Conda
+source activate biol-7180
+
+# Ejecutar tu script
+# (Asegúrate de que los nombres de los archivos coincidan)
+bash preprocess_homalodisca.sh \
+  -a R1.fastq.gz \
+  -b R2.fastq.gz \
+  -g genomes/homalodisca/homalodisca_genome.fasta \
+  -s Apollo_11 \
+  -t 16
