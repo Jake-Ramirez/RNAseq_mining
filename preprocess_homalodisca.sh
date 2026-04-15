@@ -107,6 +107,33 @@ else
 fi
 log "Input reads: $TOTAL_READS"
 
+# Bloque de trimming y  conteo
+log "Starting quality trimming with fastp..."
+
+# Definimos los nombres de los archivos trimmeados
+TRIMMED_R1="${OUTPUT_DIR}/${SAMPLE_NAME}_trimmed_R1.fastq.gz"
+TRIMMED_R2="${OUTPUT_DIR}/${SAMPLE_NAME}_trimmed_R2.fastq.gz"
+
+fastp -i "$R1_FILE" -I "$R2_FILE" \
+      -o "$TRIMMED_R1" -O "$TRIMMED_R2" \
+      --html "${OUTPUT_DIR}/${SAMPLE_NAME}_fastp.html" \
+      --thread "$THREADS" \
+      --detect_adapter_for_pe \
+      2> "${OUTPUT_DIR}/${SAMPLE_NAME}_fastp.log" # Guardamos el reporte de fastp
+
+# Contamos cuántas lecturas sobrevivieron
+# Dividimos por 4 porque cada lectura en FASTQ ocupa 4 líneas
+log "Counting reads after trimming..."
+TRIMMED_READS=$(zcat "$TRIMMED_R1" | echo $((`wc -l`/4)))
+
+log "Input reads: $INPUT_READS"
+log "Reads after trimming: $TRIMMED_READS"
+
+# Actualizamos las variables para que STAR use los archivos limpios
+R1_FILE="$TRIMMED_R1"
+R2_FILE="$TRIMMED_R2"
+# -----------------------------------------
+
 # Host genome filtering (if genome provided)
 if [[ "$FILTER_HOST" == true ]]; then
     log "Filtering host reads using STAR..."
@@ -155,7 +182,7 @@ if [[ "$FILTER_HOST" == true ]]; then
         touch "$NONHOST_R2"
     fi
     
-    # Definimos el SAM_FILE para el conteo y limpieza posterior (nombre que pone STAR por defecto)
+    # Definimos el SAM_FILE para el conteo y limpieza posterior (nombre por defecto de STAR)
     SAM_FILE="$OUTPUT_DIR/${SAMPLE_NAME}_Aligned.out.sam"
     
     # Count non-host reads
@@ -221,6 +248,7 @@ Preprocessing Summary for Sample: $SAMPLE_NAME
 Input R1 file: $R1_FILE
 Input R2 file: $R2_FILE
 Total input reads: $TOTAL_READS
+Total reads post-trimming: $TRIMMED_READS
 Host genome: ${HOST_GENOME:-"Not provided"}
 Host filtering: $FILTER_HOST
 Final read count: $FINAL_READ_COUNT
