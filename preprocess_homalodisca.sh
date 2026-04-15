@@ -123,7 +123,7 @@ fastp -i "$R1_FILE" -I "$R2_FILE" \
 
 # Dividimos por 4 porque cada lectura en FASTQ ocupa 4 líneas
 log "Counting reads after trimming..."
-TRIMMED_READS=$(zcat "$TRIMMED_R1" | echo $((`wc -l`/4)))
+TRIMMED_READS=$(zcat "$TRIMMED_R1" | wc -l | awk '{print $1 / 4}')
 
 log "Input reads: $INPUT_READS"
 log "Reads after trimming: $TRIMMED_READS"
