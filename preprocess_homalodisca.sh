@@ -119,7 +119,6 @@ if [[ "$FILTER_HOST" == true ]]; then
              --runMode genomeGenerate \
              --genomeDir "$GENOME_DIR" \
              --genomeFastaFiles "$HOST_GENOME" \
-             --sjdbOverhang 99
     else
         log "STAR index found in $GENOME_DIR, skipping index build."
     fi
