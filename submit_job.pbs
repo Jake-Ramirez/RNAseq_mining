@@ -17,5 +17,5 @@ bash preprocess_homalodisca.sh \
   -a R1.fastq.gz \
   -b R2.fastq.gz \
   -g genomes/homalodisca/homalodisca_genome.fasta \
-  -s Apollo_11 \
+  -s Apollo_12 \
   -t 16
