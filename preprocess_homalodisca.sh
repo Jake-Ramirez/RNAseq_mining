@@ -121,7 +121,6 @@ fastp -i "$R1_FILE" -I "$R2_FILE" \
       --detect_adapter_for_pe \
       2> "${OUTPUT_DIR}/${SAMPLE_NAME}_fastp.log" # Guardamos el reporte de fastp
 
-# Contamos cuántas lecturas sobrevivieron
 # Dividimos por 4 porque cada lectura en FASTQ ocupa 4 líneas
 log "Counting reads after trimming..."
 TRIMMED_READS=$(zcat "$TRIMMED_R1" | echo $((`wc -l`/4)))
@@ -132,7 +131,7 @@ log "Reads after trimming: $TRIMMED_READS"
 # Actualizamos las variables para que STAR use los archivos limpios
 R1_FILE="$TRIMMED_R1"
 R2_FILE="$TRIMMED_R2"
-# -----------------------------------------
+
 
 # Host genome filtering (if genome provided)
 if [[ "$FILTER_HOST" == true ]]; then
@@ -245,6 +244,8 @@ SUMMARY_FILE="$OUTPUT_DIR/${SAMPLE_NAME}_preprocessing_summary.txt"
 cat > "$SUMMARY_FILE" << EOF
 Preprocessing Summary for Sample: $SAMPLE_NAME
 ==============================================
+Non host reads: $NONHOST_READS
+Host percentage: $HOST_PERCENTAGE
 Input R1 file: $R1_FILE
 Input R2 file: $R2_FILE
 Total input reads: $TOTAL_READS
