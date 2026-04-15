@@ -136,6 +136,10 @@ if [[ "$FILTER_HOST" == true ]]; then
          --outReadsUnmapped Fastx \
 	 --outTmpDir "$OUTPUT_DIR/${SAMPLE_NAME}_STARtmp"
 
+    # Files to move unmapped non-host reads
+    NONHOST_R1="${OUTPUT_DIR}/${SAMPLE_NAME}_nonhost_R1.fastq"
+    NONHOST_R2="${OUTPUT_DIR}/${SAMPLE_NAME}_nonhost_R2.fastq"
+
     # Define unmapped files created by default
     UNMAPPED_R1="$OUTPUT_DIR/${SAMPLE_NAME}_Unmapped.out.mate1"
     UNMAPPED_R2="$OUTPUT_DIR/${SAMPLE_NAME}_Unmapped.out.mate2"
